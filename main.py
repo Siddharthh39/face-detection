@@ -37,3 +37,5 @@ while True:
 
 # Release the webcam resource. This is important to free up the camera for other applications.
 video_cap.release()
+def new():
+    pass
