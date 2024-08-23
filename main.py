@@ -19,3 +19,6 @@ while True:
         break
 
 video_cap.release
+
+class faceRecogination():
+    pass
