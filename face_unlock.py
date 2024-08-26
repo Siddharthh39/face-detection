@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-# Load the face detector and the authorized face
+
 face_cap = cv2.CascadeClassifier("C:/Users/singh/AppData/Roaming/Python/Python38/site-packages/cv2/data/haarcascade_frontalface_default.xml")
 video_cap = cv2.VideoCapture(0)
 authorized_face_path = "face_data/authorized_face.jpg"
@@ -26,7 +26,7 @@ while True:
         face_data = gray[y:y+h, x:x+w]
         similarity = recognize_face(face_data)
         
-        if similarity > 0.7:  # Adjust threshold as needed
+        if similarity > 0.7:  
             cv2.putText(frame, "Welcome, User!", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             print("Face recognized. Welcome, User!")
         else:
