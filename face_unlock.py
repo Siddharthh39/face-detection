@@ -8,6 +8,11 @@ face_cap = cv2.CascadeClassifier("/usr/share/opencv4/haarcascades/haarcascade_fr
 # Initialize video capture
 video_cap = cv2.VideoCapture(0)
 
+# Check if the video capture device is opened
+if not video_cap.isOpened():
+    print("Error: Could not open video capture.")
+    exit()
+
 # Path to the authorized face image
 authorized_face_path = "face_data/authorized_face.jpg"
 authorized_face = cv2.imread(authorized_face_path, cv2.IMREAD_GRAYSCALE)
@@ -23,11 +28,12 @@ def recognize_face(face_data):
 
 print("Starting face recognition... Position your face and press 's' to start recognition.")
 
-# Variable to track recognition status
-face_recognized = False
-
 while True:
     ret, frame = video_cap.read()
+    if not ret:
+        print("Error: Failed to capture image.")
+        break
+
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
     # Detect faces with a minimum size to ensure human faces are captured
@@ -40,37 +46,32 @@ while True:
         # Indicate to the user to press 's' to start recognition
         cv2.putText(frame, "Press 's' to recognize", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
 
-        # Wait for the user to press 's' to start recognition
-        key = cv2.waitKey(1) & 0xFF
-        
-        if key == ord('s'):
-            face_data = gray[y:y+h, x:x+w]
-            similarity = recognize_face(face_data)
-            
-            if similarity > 0.7:  
-                cv2.putText(frame, "Welcome, User!", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                print("Face recognized. Welcome, User!")
-                cv2.imshow("Face Unlock", frame)
-                cv2.waitKey(2000)  # Pause for 2 seconds to display the result
-                subprocess.Popen(["python3", "logIN.py"])  # Open the logged-in window
-                face_recognized = True
-                break  # Exit the loop after successful recognition
-            else:
-                cv2.putText(frame, "Unauthorized", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                print("Face not recognized.")
-                cv2.imshow("Face Unlock", frame)
-                cv2.waitKey(2000)  # Pause for 2 seconds to display the result
-                face_recognized = False
-                break  # Exit the loop after failed recognition
-
+    # Display the frame
     cv2.imshow("Face Unlock", frame)
 
-    # Handle exit condition
-    if face_recognized or not face_recognized:
-        break
+    # Handle key presses
+    key = cv2.waitKey(1) & 0xFF
+    
+    if key == ord('s') and len(faces) > 0:
+        (x, y, w, h) = faces[0]  # Use the first detected face
+        face_data = gray[y:y+h, x:x+w]
+        similarity = recognize_face(face_data)
+        
+        if similarity > 0.7:
+            cv2.putText(frame, "Welcome, User!", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            print("Face recognized. Welcome, User!")
+            cv2.imshow("Face Unlock", frame)
+            cv2.waitKey(2000)  # Pause for 2 seconds to display the result
+            subprocess.Popen(["python3", "logIN.py"])  # Open the logged-in window
+            break  # Exit the loop after successful recognition
+        else:
+            cv2.putText(frame, "Unauthorized", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            print("Face not recognized.")
+            cv2.imshow("Face Unlock", frame)
+            cv2.waitKey(2000)  # Pause for 2 seconds to display the result
 
     # Press 'q' to quit the recognition process
-    if key == ord('q'):
+    if key == ord('a'):
         break
 
 video_cap.release()
