@@ -1,24 +1,27 @@
-import cv2
-face_cap = cv2.CascadeClassifier("C:/Users/singh/AppData/Roaming/Python/Python38/site-packages/cv2/data/haarcascade_frontalface_default.xml")
-video_cap =cv2.VideoCapture(0)
+import tkinter as tk
+import subprocess
 
-while True:
-    ret , video_data =video_cap.read()
-    col = cv2.cvtColor(video_data,cv2.COLOR_BGR2GRAY)
-    faces = face_cap.detectMultiScale(
-        col,
-        scaleFactor=1.1,
-        minNeighbors=5,
-        minSize=(30,30),
-        flags=cv2.CASCADE_SCALE_IMAGE
-    )
-    for (x,y,w,h) in faces:
-        cv2.rectangle(video_data,(x,y),(x+w,y+h),(0,255,0),2)
-    cv2.imshow("video_live",video_data)
-    if cv2.waitKey(10) == ord("a"):
-        break
+# Function to run the face registration script
+def record_face_data():
+    subprocess.run(["python", "face_registration.py"])
 
-video_cap.release
+# Function to run the face unlock script
+def verify_face_data():
+    subprocess.run(["python", "face_unlock.py"])
 
-class faceRecogination():
-    pass
+# Create the main window
+root = tk.Tk()
+root.title("Face Unlock System")
+
+# Set the size of the window
+root.geometry("300x150")
+
+# Create buttons for the two options
+record_button = tk.Button(root, text="Record New Face Data", command=record_face_data, width=25, height=2)
+record_button.pack(pady=10)
+
+verify_button = tk.Button(root, text="Verify Face Data", command=verify_face_data, width=25, height=2)
+verify_button.pack(pady=10)
+
+# Start the Tkinter main loop
+root.mainloop()
