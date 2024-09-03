@@ -35,15 +35,15 @@ while True:
         break
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
-    # Detect faces with a minimum size to ensure human faces are captured
     faces = face_cap.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(100, 100))
 
-    for (x, y, w, h) in faces:
-        # Draw a rectangle around the detected face
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        
-        # Indicate to the user to press 's' to start recognition
+    if len(faces) > 0:
+        # Find the closest face by selecting the one with the maximum width
+        closest_face = max(faces, key=lambda face: face[2])  # face[2] is the width of the face
+        (x, y, w, h) = closest_face
+
+        # Draw a rectangle around the closest face
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cv2.putText(frame, "Press 's' to recognize", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
 
     # Display the frame
@@ -51,12 +51,12 @@ while True:
 
     # Handle key presses
     key = cv2.waitKey(1) & 0xFF
-    
+
     if key == ord('s') and len(faces) > 0:
-        (x, y, w, h) = faces[0]  # Use the first detected face
-        face_data = gray[y:y+h, x:x+w]
+        # Use the closest face for recognition
+        face_data = gray[y:y + h, x:x + w]
         similarity = recognize_face(face_data)
-        
+
         if similarity > 0.7:
             cv2.putText(frame, "Welcome, User!", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             print("Face recognized. Welcome, User!")
