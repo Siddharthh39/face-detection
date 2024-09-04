@@ -1,52 +1,56 @@
 import cv2
 import numpy as np
-import subprocess
-import userData  # Import userData for credential handling
+import tkinter as tk
+from tkinter import messagebox, simpledialog
 
 # Initialize the face detector
+# For Linux
 face_cap = cv2.CascadeClassifier("/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml")
+# For Windows
+face_cap = cv2.CascadeClassifier("C:/Users/singh/AppData/Roaming/Python/Python38/site-packages/cv2/data/haarcascade_frontalface_default.xml")
 video_cap = cv2.VideoCapture(0)
 
-if not video_cap.isOpened():
-    print("Error: Could not open video capture.")
-    exit()
-
-# Load the registered face
+# Path to the authorized face image
 authorized_face_path = "face_data/authorized_face.jpg"
 authorized_face = cv2.imread(authorized_face_path, cv2.IMREAD_GRAYSCALE)
-if authorized_face is None:
-    print("No authorized face found. Please register a face first.")
+
+# Load the credentials
+with open("face_data/credentials.txt", "r") as cred_file:
+    stored_security_code, stored_password = cred_file.read().splitlines()
+
+# Function to verify security code and password
+def verify_credentials():
+    tries = 3
+    while tries > 0:
+        security_code = simpledialog.askstring("Security Code", "Enter your 5-digit security code:", parent=root)
+        if len(security_code) != 5:
+            messagebox.showerror("Error", "The security code must be exactly 5 digits.")
+            continue
+
+        password = simpledialog.askstring("Password", "Enter your password:", parent=root, show="*")
+        if len(password) < 5:
+            messagebox.showerror("Error", "The password must be at least 5 characters.")
+            continue
+
+        if security_code == stored_security_code and password == stored_password:
+            return True
+        else:
+            tries -= 1
+            messagebox.showerror("Error", f"Invalid credentials. {tries} tries left.")
+    
+    return False
+
+# Start Tkinter root window
+root = tk.Tk()
+root.withdraw()  # Hide the root window
+
+# Verify credentials
+if not verify_credentials():
+    messagebox.showerror("Error", "Tries exhausted. Access denied.")
     exit()
 
-def recognize_face(face_data):
-    result = cv2.matchTemplate(face_data, authorized_face, cv2.TM_CCOEFF_NORMED)
-    return np.max(result)
-
-# Load saved credentials
-credentials = userData.load_credentials()
-if not credentials:
-    print("No credentials found. Please register a user first.")
-    exit()
-
-# Prompt the user for the security code and password
-attempts = 3
-while attempts > 0:
-    entered_code = input("Enter your 5-digit security code: ")
-    entered_password = input("Enter your password: ")
-
-    if entered_code == credentials["security_code"] and entered_password == credentials["password"]:
-        print("Credentials matched. Starting face recognition...")
-        break
-    else:
-        attempts -= 1
-        print(f"Incorrect credentials. {attempts} attempts remaining.")
-
-    if attempts == 0:
-        print("Tries exhausted. Access denied.")
-        exit()
-
+# Proceed with face unlock
 print("Starting face recognition... Position your face and press 's' to start recognition.")
-
 while True:
     ret, frame = video_cap.read()
     if not ret:
@@ -59,7 +63,6 @@ while True:
     if len(faces) > 0:
         closest_face = max(faces, key=lambda face: face[2])
         (x, y, w, h) = closest_face
-
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cv2.putText(frame, "Press 's' to recognize", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
 
@@ -68,21 +71,15 @@ while True:
 
     if key == ord('s') and len(faces) > 0:
         face_data = gray[y:y + h, x:x + w]
-        similarity = recognize_face(face_data)
-
-        if similarity > 0.7:
-            cv2.putText(frame, "Welcome, User!", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        similarity = cv2.matchTemplate(face_data, authorized_face, cv2.TM_CCOEFF_NORMED)
+        
+        if np.max(similarity) > 0.7:
+            messagebox.showinfo("Access Granted", "Welcome, User!")
             print("Face recognized. Welcome, User!")
-            cv2.imshow("Face Unlock", frame)
-            cv2.waitKey(2000)
-            subprocess.Popen(["python3", "logIN.py"])
             break
         else:
-            cv2.putText(frame, "Unauthorized", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-            print("Face not recognized.")
-            cv2.imshow("Face Unlock", frame)
-            cv2.waitKey(2000)
-
+            messagebox.showerror("Access Denied", "Face not recognized.")
+    
     if key == ord('a'):
         break
 
