@@ -4,7 +4,10 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog
 
 # Initialize the face detector
+# For Linux
 face_cap = cv2.CascadeClassifier("/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml")
+# For Windows
+face_cap = cv2.CascadeClassifier("C:/Users/singh/AppData/Roaming/Python/Python38/site-packages/cv2/data/haarcascade_frontalface_default.xml")
 video_cap = cv2.VideoCapture(0)
 
 # Directory to save the face data
