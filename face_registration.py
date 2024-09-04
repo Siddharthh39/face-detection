@@ -1,9 +1,9 @@
 import cv2
 import os
+import userData  # Import the new userData module for handling credentials
 
 # Initialize the face detector
 face_cap = cv2.CascadeClassifier("/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml")
-
 video_cap = cv2.VideoCapture(0)
 
 # Directory to save the face data
@@ -21,22 +21,18 @@ while True:
     faces = face_cap.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(100, 100))
 
     if len(faces) > 0:
-        # Find the closest face by selecting the one with the maximum width
-        closest_face = max(faces, key=lambda face: face[2])  # face[2] is the width of the face
+        closest_face = max(faces, key=lambda face: face[2])  # Find the closest face
         (x, y, w, h) = closest_face
 
         # Draw a rectangle around the closest face
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cv2.putText(frame, "Press 's' to save", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
 
-    # Display the frame
     cv2.imshow("Register Face", frame)
-
-    # Handle key press
     key = cv2.waitKey(1) & 0xFF
 
     if key == ord('s') and len(faces) > 0:
-        # Save the closest face data if 's' is pressed
+        # Save the closest face data
         face_data = gray[y:y + h, x:x + w]
         cv2.imwrite(f"{face_data_dir}/authorized_face.jpg", face_data)
         face_registered = True
@@ -44,7 +40,6 @@ while True:
         stop_requested = True
 
     elif key == ord('a'):
-        # Stop the loop if 'a' is pressed
         stop_requested = True
 
     if stop_requested:
@@ -54,6 +49,15 @@ video_cap.release()
 cv2.destroyAllWindows()
 
 if face_registered:
-    print("Face registration complete. You can now use face unlock.")
+    # Prompt the developer to enter a 5-digit code and password
+    print("Please enter a 5-digit security code:")
+    security_code = input("> ")
+
+    print("Please enter a password:")
+    password = input("> ")
+
+    # Save the credentials using userData
+    userData.save_credentials(security_code, password)
+    print("Registration complete. You can now use face unlock.")
 else:
     print("Face registration canceled.")
