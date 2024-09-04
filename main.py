@@ -1,39 +1,27 @@
-import cv2
+import tkinter as tk
+import subprocess
 
-# Load the pre-trained face detection model from OpenCV's data directory.
-face_cap = cv2.CascadeClassifier("C:/Users/singh/AppData/Roaming/Python/Python38/site-packages/cv2/data/haarcascade_frontalface_default.xml")
+# Function to run the face registration script
+def record_face_data():
+    subprocess.run(["python", "face_registration.py"])
 
-# Start capturing video from the default webcam (0 refers to the default camera).
-video_cap = cv2.VideoCapture(0)
+# Function to run the face unlock script
+def verify_face_data():
+    subprocess.run(["python", "face_unlock.py"])
 
-# Enter an infinite loop to process the video frame by frame.
-while True:
-    # Capture a single frame of video. 'ret' is a boolean that indicates if the frame was captured successfully.
-    ret, video_data = video_cap.read()
-    
-    # Convert the captured frame to grayscale. Face detection typically works better on grayscale images.
-    col = cv2.cvtColor(video_data, cv2.COLOR_BGR2GRAY)
-    
-    # Detect faces in the grayscale image. This function returns a list of rectangles where faces are detected.
-    faces = face_cap.detectMultiScale(
-        col,                   # The input image in grayscale.
-        scaleFactor=1.1,       # The factor by which the image size is reduced at each image scale.
-        minNeighbors=5,        # The number of neighbors each rectangle should have to retain it.
-        minSize=(30, 30),      # The minimum possible object size (faces smaller than this are ignored).
-        flags=cv2.CASCADE_SCALE_IMAGE  # The flag used to indicate the method of scaling the image.
-    )
-    
-    # Loop through the list of detected faces.
-    for (x, y, w, h) in faces:
-        # Draw a rectangle around each detected face in the original (colored) video frame.
-        cv2.rectangle(video_data, (x, y), (x+w, y+h), (0, 255, 0), 2)
-    
-    # Display the current frame with the rectangles drawn around detected faces.
-    cv2.imshow("video_live", video_data)
-    
-    # Wait for 10 milliseconds for a key press. If the key 'a' is pressed, exit the loop and stop the video capture.
-    if cv2.waitKey(10) == ord("a"):
-        break
+# Create the main window
+root = tk.Tk()
+root.title("Face Unlock System")
 
-# Release the webcam resource. This is important to free up the camera for other applications.
-video_cap.release()
+# Set the size of the window
+root.geometry("300x150")
+
+# Create buttons for the two options
+record_button = tk.Button(root, text="Record New Face Data", command=record_face_data, width=25, height=2)
+record_button.pack(pady=10)
+
+verify_button = tk.Button(root, text="Verify Face Data", command=verify_face_data, width=25, height=2)
+verify_button.pack(pady=10)
+
+# Start the Tkinter main loop
+root.mainloop()
