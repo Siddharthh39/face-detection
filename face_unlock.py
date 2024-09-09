@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import tkinter as tk
 from tkinter import messagebox, simpledialog
+from securityQuestion import verify_security_questions
 
 # Initialize the face detector
 # For Linux
@@ -47,6 +48,10 @@ root.withdraw()  # Hide the root window
 # Verify credentials
 if not verify_credentials():
     messagebox.showerror("Error", "Tries exhausted. Access denied.")
+    exit()
+# Security questions
+if not verify_security_questions():
+    messagebox.showerror("Error", "Incorrect answers for registered questions.")
     exit()
 
 # Proceed with face unlock
