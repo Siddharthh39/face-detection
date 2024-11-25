@@ -6,9 +6,9 @@ from securityQuestion import set_security_questions
 
 # Initialize the face detector
 # For Linux
-face_cap = cv2.CascadeClassifier("/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml")
+face_cap = cv2.CascadeClassifier("/home/cosmic/shared vm/Projects/atm revamp/myenv/Lib/site-packages/cv2/data/haarcascade_frontalface_default.xml")
 # For Windows
-face_cap = cv2.CascadeClassifier("C:/Users/singh/AppData/Roaming/Python/Python38/site-packages/cv2/data/haarcascade_frontalface_default.xml")
+# face_cap = cv2.CascadeClassifier("C:/Users/singh/AppData/Roaming/Python/Python38/site-packages/cv2/data/haarcascade_frontalface_default.xml")
 video_cap = cv2.VideoCapture(0)
 
 # Directory to save the face data
