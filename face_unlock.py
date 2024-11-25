@@ -2,14 +2,15 @@ import cv2
 import numpy as np
 import tkinter as tk
 from tkinter import messagebox, simpledialog
+from securityQuestion import verify_security_questions
 
 # Initialize the face detector
 # For Linux
-face_cap = cv2.CascadeClassifier("/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml")
+face_cap = cv2.CascadeClassifier("/home/cosmic/shared vm/Projects/atm revamp/myenv/Lib/site-packages/cv2/data/haarcascade_frontalface_default.xml")
 # For Windows
-face_cap = cv2.CascadeClassifier("C:/Users/singh/AppData/Roaming/Python/Python38/site-packages/cv2/data/haarcascade_frontalface_default.xml")
+# face_cap = cv2.CascadeClassifier("C:/Users/singh/AppData/Roaming/Python/Python38/site-packages/cv2/data/haarcascade_frontalface_default.xml")
 video_cap = cv2.VideoCapture(0)
-
+ 
 # Path to the authorized face image
 authorized_face_path = "face_data/authorized_face.jpg"
 authorized_face = cv2.imread(authorized_face_path, cv2.IMREAD_GRAYSCALE)
@@ -47,6 +48,10 @@ root.withdraw()  # Hide the root window
 # Verify credentials
 if not verify_credentials():
     messagebox.showerror("Error", "Tries exhausted. Access denied.")
+    exit()
+# Security questions
+if not verify_security_questions():
+    messagebox.showerror("Error", "Incorrect answers for registered questions.")
     exit()
 
 # Proceed with face unlock

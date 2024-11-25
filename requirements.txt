@@ -1,0 +1,12 @@
+opencv-python
+opencv-python-headless  
+numpy
+pillow  
+tk  
+'''
+sudo apt-get install python3-tk for linux users if tkinter is issue
+for venv setup /home/cosmic/shared vm/Projects/atm revamp/myenv/Lib/site-packages/cv2/data/haarcascade_frontalface_default.xml 
+path refrence
+for global pkg : linux   : /usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml
+               : windows : C:/Users/singh/AppData/Roaming/Python/Python38/site-packages/cv2/data/haarcascade_frontalface_default.xml
+'''

@@ -2,12 +2,13 @@ import cv2
 import os
 import tkinter as tk
 from tkinter import messagebox, simpledialog
+from securityQuestion import set_security_questions
 
 # Initialize the face detector
 # For Linux
-face_cap = cv2.CascadeClassifier("/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml")
+face_cap = cv2.CascadeClassifier("/home/cosmic/shared vm/Projects/atm revamp/myenv/Lib/site-packages/cv2/data/haarcascade_frontalface_default.xml")
 # For Windows
-face_cap = cv2.CascadeClassifier("C:/Users/singh/AppData/Roaming/Python/Python38/site-packages/cv2/data/haarcascade_frontalface_default.xml")
+# face_cap = cv2.CascadeClassifier("C:/Users/singh/AppData/Roaming/Python/Python38/site-packages/cv2/data/haarcascade_frontalface_default.xml")
 video_cap = cv2.VideoCapture(0)
 
 # Directory to save the face data
@@ -64,13 +65,21 @@ while True:
 video_cap.release()
 cv2.destroyAllWindows()
 
+# Modify the existing code where credentials are set
 if face_registered:
     # Prompt for security code and password
     security_code, password = prompt_for_credentials()
-    
+
     # Save the credentials to a file
     with open(f"{face_data_dir}/credentials.txt", "w") as cred_file:
         cred_file.write(f"{security_code}\n{password}")
+
+    # Prompt for security questions
+    questions, answers = set_security_questions()
+    if not questions:
+        print("Registration failed due to missing security questions.")
+        exit()
+
     print("Face registration complete. You can now use face unlock.")
 else:
     print("Face registration canceled.")
